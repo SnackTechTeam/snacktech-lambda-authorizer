@@ -24,7 +24,7 @@ def validate_cpf(cpf: str):
             f"PWD={DB_CONFIG['password']}",
         )
         cursor = connection.cursor()
-        cursor.execute("",(cpf,))
+        cursor.execute("SELECT ID FROM snacktech.dbo.Cliente WHERE Cpf = %s",(cpf,))
         result = cursor.fetchone()
 
         return result[0] > 0

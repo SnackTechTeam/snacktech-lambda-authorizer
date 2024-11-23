@@ -7,18 +7,16 @@ def lambda_handler(event, context):
     """
     print("Event", json.dumps(event, indent=2))
 
-    cpf = event.get("cpf")
+    cpf = event.get("headers", {}).get("cpf")
     method_arn = event.get("methodArn")
-
-    if not cpf or not method_arn:
-        raise Exception("Unauthorized")
     
     try:
         if validate_token(cpf):
-            policy = generate_policy("user","Allow", method_arn)
+            effect = "Allow"
         else:
-            policy = generate_policy("user", "Deny", method_arn)
+            effect = "Deny"
 
+        policy = generate_policy("user", effect, method_arn)
         return policy
     except Exception as e:
         print(f"Error: {e}")
@@ -28,6 +26,8 @@ def validate_token(cpf):
     """
     Faz a validação do cpf do cliente
     """
+    if not cpf:
+        return False
     return validate_cpf(cpf)
 
 def generate_policy(principal_id, effect, resource):
@@ -37,16 +37,19 @@ def generate_policy(principal_id, effect, resource):
     if effect not in ("Allow","Deny"):
         raise ValueError("Invalid policy effect")
     
+    policy_document = {
+        "Version": "2012-10-17",  # Versão da política
+        "Statement": [
+            {
+                "Action": "execute-api:Invoke",  # Ação permitida/negada
+                "Effect": effect,               # Allow ou Deny
+                "Resource": resource            # Recurso protegido
+            }
+        ]
+    }
+    
     return {
-        "principalId": principal_id,
-        "policyDocument":{
-            "Version": "2012-10-17",
-            "Statement": [
-                {
-                    "Action": "execute-api:Invoke",
-                    "Effect": effect,
-                    "Resource": resource,
-                }
-            ]
-        }
+        "principalId": principal_id,  # Identificador único do usuário
+        "policyDocument": policy_document,  # Documento da política gerada
+        "context": {}
     }
