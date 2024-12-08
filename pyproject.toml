@@ -1,5 +1,5 @@
 [tool.poetry]
-name = "snacktech-clientauthorizer"
+name = "client_authorizer"
 version = "0.1.0"
 description = ""
 authors = ["Rafael <rafael.dgs.1993@gmail.com>"]
@@ -8,6 +8,7 @@ readme = "README.md"
 [tool.poetry.dependencies]
 python = "^3.10"
 pyodbc = "^5.2.0"
+aws-lambda-powertools = "^3.3.0"
 
 
 [build-system]
