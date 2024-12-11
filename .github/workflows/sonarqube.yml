@@ -58,13 +58,20 @@ jobs:
       run: |
         java -version
 
-    # Executar o SonarScanner
-    - name: Run SonarScanner
+# Configurar o Java 17 corretamente antes de rodar o SonarScanner
+    - name: Configure JAVA_HOME and PATH for Java 17
+      run: |
+        export JAVA_HOME=/usr/lib/jvm/temurin-17-jdk-amd64
+        export PATH="$JAVA_HOME/bin:$PATH"
+        echo "JAVA_HOME set to $JAVA_HOME"
+        java -version
+
+    - name: Run SonarScanner with Java 17
       env:
         SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
       run: |
         cd src/
-        sonar-scanner -X \
+        JAVA_HOME=$JAVA_HOME sonar-scanner -X \
           -Dsonar.projectKey="SnackTechTeam_snacktech-lambda-authorizer" \
           -Dsonar.organization="snacktechteam" \
           -Dsonar.host.url="https://sonarcloud.io" \
