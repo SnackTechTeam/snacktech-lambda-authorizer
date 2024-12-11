@@ -34,7 +34,14 @@ jobs:
     # Executar o Pylint para validação estática
     - name: Run Pylint
       run: |
-        pylint src/handler.py || true
+        pylint src/handler.py --extension-pkg-allow-list=pyodbc || true
+
+    # Download e configuração do SonarScanner
+    - name: Download and configure SonarScanner
+      run: |
+        curl -sSLo sonarscanner.zip https://binaries.sonarsource.com/Distribution/sonar-scanner-cli/sonar-scanner-cli-4.7.0.2747-linux.zip
+        unzip sonarscanner.zip -d $HOME
+        export PATH="$HOME/sonar-scanner-4.7.0.2747-linux/bin:$PATH"
 
     # Executar o SonarScanner
     - name: Run SonarScanner
