@@ -40,8 +40,8 @@ jobs:
     - name: Download and configure SonarScanner
       run: |
         curl -sSLo sonarscanner.zip https://binaries.sonarsource.com/Distribution/sonar-scanner-cli/sonar-scanner-cli-4.7.0.2747-linux.zip
-        unzip sonarscanner.zip -d $HOME
-        export PATH="$HOME/sonar-scanner-4.7.0.2747-linux/bin:$PATH"
+        unzip sonarscanner.zip -d $HOME/sonar-scanner
+        echo "$HOME/sonar-scanner/sonar-scanner-4.7.0.2747-linux/bin" >> $GITHUB_PATH
 
     # Executar o SonarScanner
     - name: Run SonarScanner
