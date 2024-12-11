@@ -38,6 +38,13 @@ jobs:
         distribution: 'temurin' # Usar Temurin JDK
         java-version: '17'
 
+    # Configurar PATH para usar Java 17
+    - name: Configure Java 17 in PATH
+      run: |
+        export JAVA_HOME=$(find / -name "jdk-17*" | head -n 1)
+        export PATH="$JAVA_HOME/bin:$PATH"
+        java -version
+
     # Download e configuração do SonarScanner
     - name: Download and configure SonarScanner
       run: |
