@@ -1,0 +1,50 @@
+name: python-sonar-analysis
+
+on:
+  push:
+    branches: [ "main", "development" ]
+  pull_request:
+    branches: [ "main", "development" ]
+
+jobs:
+  sonar-analysis:
+    name: Analyze lambda-authorizer (Python)
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v4
+
+    # Listar os arquivos no repositório após o checkout
+    - name: List files in repository
+      run: |
+        echo "Listing files..."
+        ls -R
+
+    # Configurar Python e instalar dependências
+    - name: Set up Python
+      uses: actions/setup-python@v4
+      with:
+        python-version: '3.x'
+
+    - name: Install dependencies
+      run: |
+        pip install -r requirements.txt
+        pip install pylint
+
+    # Executar o Pylint para validação estática
+    - name: Run Pylint
+      run: |
+        pylint src/handler.py || true
+
+    # Executar o SonarScanner
+    - name: Run SonarScanner
+      env:
+        SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+      run: |
+        cd src/
+        sonar-scanner \
+          -Dsonar.projectKey="SnackTechTeam_snacktech-lambda-authorizer" \
+          -Dsonar.organization="snacktechteam" \
+          -Dsonar.host.url="https://sonarcloud.io" \
+          -Dsonar.login="${{ secrets.SONAR_TOKEN }}" \
+          -Dsonar.sources="."
