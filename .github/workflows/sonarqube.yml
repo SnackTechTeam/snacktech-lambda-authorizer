@@ -36,4 +36,10 @@ jobs:
       uses: SonarSource/sonarcloud-github-action@v3
       with:
         organization: 'snacktechteam'
-        projectKey: 'SnackTechTeam_sna
+        projectKey: 'SnackTechTeam_snacktech-lambda-authorizer'
+      env:
+        SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+
+    - name: Run SonarCloud Analysis
+      run: |
+        sonar-scanner -Dsonar.sources=.
