@@ -24,6 +24,10 @@ jobs:
       run: |
         pip install -r requirements.txt
 
+    - name: Install SonarScanner
+      run: |
+        sudo apt-get install -y sonar-scanner
+
     - name: Set up SonarCloud
       uses: SonarSource/sonarcloud-github-action@v3
       with:
