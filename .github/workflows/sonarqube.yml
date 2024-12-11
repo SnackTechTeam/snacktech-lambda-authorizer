@@ -31,10 +31,12 @@ jobs:
         pip install -r requirements.txt
         pip install pylint
 
-    # Executar o Pylint para validação estática
-    - name: Run Pylint
-      run: |
-        pylint src/handler.py --extension-pkg-allow-list=pyodbc || true
+    # Atualizar Java para versão 17
+    - name: Set up Java 17
+      uses: actions/setup-java@v3
+      with:
+        distribution: 'temurin' # Usar Temurin JDK
+        java-version: '17'
 
     # Download e configuração do SonarScanner
     - name: Download and configure SonarScanner
