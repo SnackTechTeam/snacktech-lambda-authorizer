@@ -27,8 +27,9 @@ jobs:
     - name: Set up SonarCloud
       uses: SonarSource/sonarcloud-github-action@v3
       with:
-        organization: 'snacktechteam'
-        projectKey: 'SnackTechTeam_snacktech-lambda-authorizer'
+        args: |
+          -Dsonar.projectKey=SnackTechTeam_snacktech-lambda-authorizer
+          -Dsonar.organization=snacktechteam
       env:
         SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
 
