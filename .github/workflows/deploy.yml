@@ -6,7 +6,7 @@ on:
       - deploy
 
 jobs:
-  deploy:
+  build-and-push-image:
     runs-on: ubuntu-latest
     
     steps:
@@ -44,11 +44,49 @@ jobs:
       run: |
         docker build --build-arg RDS_HOST=${{ secrets.DB_INSTANCE }} --build-arg DB_NAME=${{ secrets.DB_NAME }} --build-arg DB_USER=${{ secrets.DB_UID }} --build-arg DB_PASSWORD=${{ secrets.DB_PASSWORD }} -t $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG . 
         docker push $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG
-        echo "::set-output name=image-uri::$ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG"
+        echo "image-uri=$ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG" >> $GITHUB_OUTPUT
+  
+  deploy:
+    needs: build-and-push-image
+    runs-on: ubuntu-latest
+
+    defaults:
+      run:
+        working-directory: terraform-lambda
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v3
+
+    - name: Configure AWS CLI
+      uses: aws-actions/configure-aws-credentials@v3
+      with:
+        aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+        aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+        aws-session-token: ${{ secrets.AWS_SECRET_ACCESS_TOKEN }}
+        aws-region: ${{ secrets.AWS_REGION }}
+
+
+    - name: Setup Terraform
+      uses: hashicorp/setup-terraform@v2
+      with:
+        terraform_version: 1.5.7 # Ajuste para a versão do Terraform utilizada
+
+    - name: Terraform Init
+      run: terraform init -backend-config="bucket=${{ secrets.BACKEND_BUCKET_NAME }}" -backend-config="key=${{ secrets.BACKEND_BUCKET_KEY }}" -backend-config="region=${{ secrets.AWS_REGION }}"
+
+    - name: Terraform Validate
+      run: terraform validate
+
+    - name: Terraform Plan
+      run: terraform plan -out=tfplan -var="regionDefault=${{ secrets.AWS_REGION }}" -var="projectName=${{ vars.PROJECT_NAME }}" -var="ecrRepositoryName=ecr-${{ vars.PROJECT_NAME }}-authorizer" -var="imageTag=latest" -var="dbHost=${{ secrets.DB_INSTANCE }}" -var="dbUser=${{ secrets.DB_UID }}" -var="dbPassword=${{ secrets.DB_PASSWORD }}" -var="dbName=${{ secrets.DB_NAME }}"  
+
+    - name: Terraform Apply
+      run: terraform apply -auto-approve tfplan
 
     - name : Deploy Lambda Function
       id: update-lambda-code
       env:
-        IMAGE_URI: ${{ steps.build-image.outputs.image-uri }}
+        IMAGE_URI: ${{ needs.build-and-push-image.outputs.image-uri }}
       run: |
         aws lambda update-function-code --function-name arn:aws:lambda:${{ secrets.AWS_REGION }}:${{ secrets.AWS_ACCOUNT_ID_VOCLABS }}:function:${{ vars.PROJECT_NAME }}-authorizer --image-uri $IMAGE_URI --publish

@@ -16,9 +16,4 @@ COPY requirements.txt ${LAMBDA_TASK_ROOT}/
 
 RUN pip install --no-cache-dir -r requirements.txt
 
-ENV RDS_HOST=${RDS_HOST}    
-ENV DB_NAME=${DB_NAME}
-ENV DB_USER=${DB_USER}
-ENV DB_PASSWORD=${DB_PASSWORD}
-
 CMD ["handler.lambda_handler"]
