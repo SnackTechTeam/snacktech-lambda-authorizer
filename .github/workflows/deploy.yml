@@ -51,4 +51,4 @@ jobs:
       env:
         IMAGE_URI: ${{ steps.build-image.outputs.image-uri }}
       run: |
-        aws lambda update-function-code --function-name arn:aws:lambda:${{ secrets.AWS_REGION }}:${{ secrets.AWS_ACCOUNT_ID_VOCLABS }}:function:${{ vars.PROJECT_NAME }}-authorizer --image-uri $IMAGE_URI  
+        aws lambda update-function-code --function-name arn:aws:lambda:${{ secrets.AWS_REGION }}:${{ secrets.AWS_ACCOUNT_ID_VOCLABS }}:function:${{ vars.PROJECT_NAME }}-authorizer --image-uri $IMAGE_URI --publish
