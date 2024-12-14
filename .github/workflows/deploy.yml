@@ -46,9 +46,9 @@ jobs:
         docker push $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG
         echo "::set-output name=image-uri::$ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG"
 
-      - name : Deploy Lambda Function
-        id: update-lambda-code
-        env:
-          IMAGE_URI: ${{ steps.build-image.outputs.image-uri }}
-        run: |
-          aws lambda update-function-code --function-name arn:aws:lambda:${{ secrets.AWS_REGION }}:${{ secrets.AWS_ACCOUNT_ID_VOCLABS }}:function:${{ vars.PROJECT_NAME }}-authorizer --image-uri $IMAGE_URI  
+    - name : Deploy Lambda Function
+      id: update-lambda-code
+      env:
+        IMAGE_URI: ${{ steps.build-image.outputs.image-uri }}
+      run: |
+        aws lambda update-function-code --function-name arn:aws:lambda:${{ secrets.AWS_REGION }}:${{ secrets.AWS_ACCOUNT_ID_VOCLABS }}:function:${{ vars.PROJECT_NAME }}-authorizer --image-uri $IMAGE_URI  
