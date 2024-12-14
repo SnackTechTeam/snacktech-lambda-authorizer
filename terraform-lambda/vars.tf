@@ -6,10 +6,6 @@ variable "projectName" {
   default = "snacktech"
 }
 
-variable "functionName" {
-  default = "${var.projectName}-authorizer"  
-}
-
 variable "lambdaTimeout" {
   default = 1000  
 }
@@ -21,16 +17,6 @@ variable "lambdaMemorySize" {
 variable "ecrRepositoryName" {}
 variable "imageTag" {}
 
-variable "dbHost" {}
-variable "dbUser" {}
-variable "dbPassword" {}
-variable "dbName" {}
-
 variable "lambdaEnvironmentVariables" {
-  default = {
-    DB_HOST = var.dbHost,
-    DB_USER = var.dbUser,
-    DB_PASSWORD = var.dbPassword,
-    DB_NAME = var.dbName
-  }
+  type = map(string)
 }

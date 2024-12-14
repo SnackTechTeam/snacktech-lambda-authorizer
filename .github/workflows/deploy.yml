@@ -79,7 +79,12 @@ jobs:
       run: terraform validate
 
     - name: Terraform Plan
-      run: terraform plan -out=tfplan -var="regionDefault=${{ secrets.AWS_REGION }}" -var="projectName=${{ vars.PROJECT_NAME }}" -var="ecrRepositoryName=ecr-${{ vars.PROJECT_NAME }}-authorizer" -var="imageTag=latest" -var="dbHost=${{ secrets.DB_INSTANCE }}" -var="dbUser=${{ secrets.DB_UID }}" -var="dbPassword=${{ secrets.DB_PASSWORD }}" -var="dbName=${{ secrets.DB_NAME }}"  
+      run: terraform plan -out=tfplan \
+              -var="regionDefault=${{ secrets.AWS_REGION }}" \
+              -var="projectName=${{ vars.PROJECT_NAME }}" \
+              -var="ecrRepositoryName=ecr-${{ vars.PROJECT_NAME }}-authorizer" \
+              -var="imageTag=latest" \
+              -var="lambdaEnvironmentVariables={\"RDS_HOST\":\"${{ secrets.DB_INSTANCE }}\",\"DB_NAME\":\"${{ secrets.DB_NAME }}\",\"DB_USER\":\"${{ secrets.DB_UID }}\",\"DB_PASSWORD\":\"${{ secrets.DB_PASSWORD }}\"}"  
 
     - name: Terraform Apply
       run: terraform apply -auto-approve tfplan
