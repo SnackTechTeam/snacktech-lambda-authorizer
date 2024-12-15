@@ -200,4 +200,4 @@ override.tf.json
 terraform.rc
 src/.terraform.lock.hcl
 terraform-lambda/.terraform.lock.hcl
-terraform-lambda/tfplan
+tfplan
