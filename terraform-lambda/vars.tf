@@ -7,7 +7,7 @@ variable "projectName" {
 }
 
 variable "lambdaTimeout" {
-  default = 1000  
+  default = 300
 }
 
 variable "lambdaMemorySize" {
