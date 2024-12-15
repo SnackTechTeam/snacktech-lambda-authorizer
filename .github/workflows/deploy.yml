@@ -85,17 +85,17 @@ jobs:
       #         -var="imageUri=${{ needs.build-and-push-image.outputs.image-uri }}" \
       #         -var="lambdaEnvironmentVariables={\"RDS_HOST\":\"${{ secrets.DB_INSTANCE }}\",\"DB_NAME\":\"${{ secrets.DB_NAME }}\",\"DB_USER\":\"${{ secrets.DB_UID }}\",\"DB_PASSWORD\":\"${{ secrets.DB_PASSWORD }}\"}"
       run: | 
-        terraform plan -out=tfplan -var="{
-            \"regionDefault\": \"${AWS_REGION}\",
-            \"projectName\": \"${PROJECT_NAME}\",
-            \"imageUri\": \"${{ needs.build-and-push-image.outputs.image-uri }}\",
-            \"lambdaEnvironmentVariables\": {
-              \"RDS_HOST\": \"${{ secrets.DB_INSTANCE }}\",
-              \"DB_NAME\": \"${{ secrets.DB_NAME }}\",
-              \"DB_USER\": \"${{ secrets.DB_UID }}\",
-              \"DB_PASSWORD\": \"${{ secrets.DB_PASSWORD }}\"
+        terraform plan -out=tfplan -var='{
+            "regionDefault": "${AWS_REGION}",
+            "projectName": "${PROJECT_NAME}",
+            "imageUri": "${{ needs.build-and-push-image.outputs.image-uri }}",
+            "lambdaEnvironmentVariables": {
+              "RDS_HOST": "${{ secrets.DB_INSTANCE }}",
+              "DB_NAME": "${{ secrets.DB_NAME }}",
+              "DB_USER": "${{ secrets.DB_UID }}",
+              "DB_PASSWORD": "${{ secrets.DB_PASSWORD }}"
             }
-          }"
+          }'
     - name: Terraform Apply
       run: terraform apply -auto-approve tfplan
 
