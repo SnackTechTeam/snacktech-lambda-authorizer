@@ -1,4 +1,4 @@
-resource "aws_lambda_function" "example_lambda" {
+resource "aws_lambda_function" "authorizer" {
   function_name = "${var.projectName}-authorizer"  
 
   image_uri    = var.imageUri
