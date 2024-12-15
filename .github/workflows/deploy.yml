@@ -85,7 +85,7 @@ jobs:
       env:
         IMAGE_URI: ${{ steps.login-ecr.outputs.registry }}/ecr-${{ vars.PROJECT_NAME }}-authorizer:${{ github.sha }}
         LAMBDA_ENVIRONMENT_VARIABLES: "{\"RDS_HOST\":\"${{ secrets.DB_INSTANCE }}\",\"DB_NAME\":\"${{ vars.DB_NAME }}\",\"DB_USER\":\"${{ secrets.DB_UID }}\",\"DB_PASSWORD\":\"${{ secrets.DB_PASSWORD }}\"}"
-      run: terraform plan -out=tfplan -var="regionDefault=${{ vars.AWS_REGION }}" -var="projectName=${{ vars.PROJECT_NAME }}" -var="imageUri=$IMAGE_URI" -var="lambdaEnvironmentVariables=$LAMBDA_ENVIRONMENT_VARIABLES"
+      run: terraform plan -out=tfplan -var="regionDefault=${{ vars.AWS_REGION }}" -var="projectName=${{ vars.PROJECT_NAME }}" -var="imageUri=$IMAGE_URI" -var="lambdaEnvironmentVariables=$LAMBDA_ENVIRONMENT_VARIABLES" -var="serviceEndpoint=${{ vars.API_SERVICE_ENDPOINT }}"
 
     - name: Terraform Apply
       run: terraform apply -auto-approve tfplan
