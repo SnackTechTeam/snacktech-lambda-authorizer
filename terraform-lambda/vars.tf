@@ -14,8 +14,7 @@ variable "lambdaMemorySize" {
   default = 256  
 }
 
-variable "ecrRepositoryName" {}
-variable "imageTag" {}
+variable "imageUri" {}
 
 variable "lambdaEnvironmentVariables" {
   type = map(string)

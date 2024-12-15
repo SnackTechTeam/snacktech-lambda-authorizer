@@ -40,7 +40,7 @@ jobs:
       env:
         ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
         ECR_REPOSITORY: ecr-${{ vars.PROJECT_NAME }}-authorizer
-        IMAGE_TAG: latest
+        IMAGE_TAG: ${{ github.sha }}
       run: |
         docker build --build-arg RDS_HOST=${{ secrets.DB_INSTANCE }} --build-arg DB_NAME=${{ secrets.DB_NAME }} --build-arg DB_USER=${{ secrets.DB_UID }} --build-arg DB_PASSWORD=${{ secrets.DB_PASSWORD }} -t $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG . 
         docker push $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG
@@ -78,13 +78,19 @@ jobs:
     - name: Terraform Validate
       run: terraform validate
 
+    # - name: Terraform Plan
+    #   run: terraform plan -out=tfplan \
+    #           -var="regionDefault=${{ secrets.AWS_REGION }}" \
+    #           -var="projectName=${{ vars.PROJECT_NAME }}" \
+    #           -var="ecrRepositoryName=ecr-${{ vars.PROJECT_NAME }}-authorizer" \
+    #           -var="imageTag=latest" \
+    #           -var="lambdaEnvironmentVariables={\"RDS_HOST\":\"${{ secrets.DB_INSTANCE }}\",\"DB_NAME\":\"${{ secrets.DB_NAME }}\",\"DB_USER\":\"${{ secrets.DB_UID }}\",\"DB_PASSWORD\":\"${{ secrets.DB_PASSWORD }}\"}"  
     - name: Terraform Plan
       run: terraform plan -out=tfplan \
               -var="regionDefault=${{ secrets.AWS_REGION }}" \
               -var="projectName=${{ vars.PROJECT_NAME }}" \
-              -var="ecrRepositoryName=ecr-${{ vars.PROJECT_NAME }}-authorizer" \
-              -var="imageTag=latest" \
-              -var="lambdaEnvironmentVariables={\"RDS_HOST\":\"${{ secrets.DB_INSTANCE }}\",\"DB_NAME\":\"${{ secrets.DB_NAME }}\",\"DB_USER\":\"${{ secrets.DB_UID }}\",\"DB_PASSWORD\":\"${{ secrets.DB_PASSWORD }}\"}"  
+              -var="imageUri=${{ needs.build-and-push-image.outputs.image-uri }}" \
+              -var="lambdaEnvironmentVariables={\"RDS_HOST\":\"${{ secrets.DB_INSTANCE }}\",\"DB_NAME\":\"${{ secrets.DB_NAME }}\",\"DB_USER\":\"${{ secrets.DB_UID }}\",\"DB_PASSWORD\":\"${{ secrets.DB_PASSWORD }}\"}"
 
     - name: Terraform Apply
       run: terraform apply -auto-approve tfplan
