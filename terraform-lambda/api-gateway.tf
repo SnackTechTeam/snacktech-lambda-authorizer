@@ -24,49 +24,14 @@ resource "aws_api_gateway_authorizer" "lambda_authorizer" {
   identity_source        = "method.request.header.cpf"
 }
 
-# Create proxy resource to catch all paths
-resource "aws_api_gateway_resource" "proxy" {
-  rest_api_id = aws_api_gateway_rest_api.api.id
-  parent_id   = aws_api_gateway_rest_api.api.root_resource_id
-  path_part   = "{proxy+}"
-}
-
-# ANY method for the proxy resource
-resource "aws_api_gateway_method" "proxy" {
-  rest_api_id   = aws_api_gateway_rest_api.api.id
-  resource_id   = aws_api_gateway_resource.proxy.id
-  http_method   = "ANY"
-  authorization = "CUSTOM"
-  authorizer_id = aws_api_gateway_authorizer.lambda_authorizer.id
-
-  request_parameters = {
-    "method.request.path.proxy" = true
-  }
-}
-
-# Integration for the proxy resource
-resource "aws_api_gateway_integration" "proxy" {
-  rest_api_id = aws_api_gateway_rest_api.api.id
-  resource_id = aws_api_gateway_resource.proxy.id
-  http_method = aws_api_gateway_method.proxy.http_method
-  
-  type                    = "HTTP_PROXY"
-  uri                     = "${var.serviceEndpoint}/{proxy}"
-  integration_http_method = "ANY"
-
-  request_parameters = {
-    "integration.request.path.proxy" = "method.request.path.proxy"
-  }
-
-  credentials = data.aws_iam_role.labrole.arn
-}
 
 # Deployment and stage
 resource "aws_api_gateway_deployment" "deployment" {
   rest_api_id = aws_api_gateway_rest_api.api.id
   
   depends_on = [
-    aws_api_gateway_integration.proxy
+    aws_api_gateway_integration.clientes_post,
+    aws_api_gateway_integration.proxy_cliente
   ]
 
   lifecycle {
@@ -78,4 +43,9 @@ resource "aws_api_gateway_stage" "stage" {
   deployment_id = aws_api_gateway_deployment.deployment.id
   rest_api_id  = aws_api_gateway_rest_api.api.id
   stage_name   = "prod"
+}
+
+
+output "stage_prod_invoke_url" {
+  value = aws_api_gateway_stage.stage.invoke_url
 }
